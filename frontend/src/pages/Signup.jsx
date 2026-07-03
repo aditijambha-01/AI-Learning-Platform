@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { registerUser } from "../services/authService";
-
+import { createUserProfile } from "../services/firestoreService";
 function Signup() {
 
 const [email, setEmail] = useState("");
@@ -14,7 +14,9 @@ e.preventDefault();
 
 try {
 
-await registerUser(email, password);
+const userCredential = await registerUser(email,password);
+
+await createUserProfile(userCredential.user);
 
 alert("Registration Successful");
 
