@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 from services.text_extractor import extract_text
 import os
 from services.document_processor import process_document
+from services.gemini_service import generate_summary
 
 api_bp = Blueprint("api", __name__)
 
@@ -38,6 +39,7 @@ def upload_file():
 
     filepath = os.path.join(
         current_app.config["UPLOAD_FOLDER"],
+
         filename
     )
 
@@ -45,10 +47,14 @@ def upload_file():
 
     text = extract_text(filepath)
     sections=process_document(text)
+    summary = generate_summary(text)
+    if summary is None:
+        summary = "⚠️ Gemini API quota exceeded. Please wait a minute and try again."
 
     return jsonify({
         "message": "File uploaded successfully",
         "filename": filename,
-        "text": text,
-        "sections": sections
+        "sections": sections,
+        "summary":summary
+
     })
